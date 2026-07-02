@@ -16,6 +16,12 @@ export const availabilityApi = {
   create: async (payload: { date: string; start_time: string; end_time: string }) => {
     const { data } = await api.post<ApiResponse<AvailabilitySlot>>("/availability", payload);
     return data.data;
+  },
+  list: async (date: string) => {
+    const { data } = await api.get<ApiResponse<AvailabilitySlot[]>>("/availability", {
+      params: { date, page: 1, limit: 100 }
+    });
+    return data.data;
   }
 };
 

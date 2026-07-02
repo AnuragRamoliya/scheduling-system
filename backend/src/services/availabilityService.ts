@@ -28,10 +28,13 @@ export const createAvailabilitySlot = async (userId: string, input: { date: stri
   });
 };
 
-export const listAvailabilitySlots = async (userId: string, page: number, limit: number) => {
+export const listAvailabilitySlots = async (userId: string, page: number, limit: number, date?: string) => {
   const offset = (page - 1) * limit;
   const result = await AvailabilitySlot.findAndCountAll({
-    where: { userId },
+    where: {
+      userId,
+      ...(date ? { date } : {})
+    },
     order: [
       ["date", "ASC"],
       ["startTime", "ASC"]

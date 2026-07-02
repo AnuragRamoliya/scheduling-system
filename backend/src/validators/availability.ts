@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { futureDateString, timeRangeRefinement, timeString, uuidParam } from "./common";
+import { dateString, futureDateString, timeRangeRefinement, timeString, uuidParam } from "./common";
 
 export const createAvailabilitySchema = z
   .object({
@@ -23,6 +23,7 @@ export const deleteAvailabilitySchema = z.object({
 export const listAvailabilitySchema = z.object({
   query: z.object({
     page: z.coerce.number().int().positive().default(1),
-    limit: z.coerce.number().int().positive().max(100).default(50)
+    limit: z.coerce.number().int().positive().max(100).default(50),
+    date: dateString.optional()
   })
 });

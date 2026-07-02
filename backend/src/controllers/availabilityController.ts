@@ -17,7 +17,12 @@ export const createAvailability: RequestHandler = async (req, res, next) => {
 
 export const listAvailability: RequestHandler = async (req, res, next) => {
   try {
-    const result = await listAvailabilitySlots(req.user!.id, Number(req.query.page), Number(req.query.limit));
+    const result = await listAvailabilitySlots(
+      req.user!.id,
+      Number(req.query.page),
+      Number(req.query.limit),
+      req.query.date ? String(req.query.date) : undefined
+    );
     res.json({
       success: true,
       data: result.data.map(serializeAvailabilitySlot),
