@@ -49,10 +49,12 @@ export const Dashboard = () => {
     if (!form.date || !form.start_time || !form.end_time) return "All availability fields are required.";
     if (form.date < todayIso()) return "Date cannot be in the past.";
     if (form.start_time >= form.end_time) return "Start time must be before end time.";
-    const duplicate = slots.some(
+    const conflictingSlot = slots.find(
       (slot) => slot.date === form.date && overlaps(form.start_time, form.end_time, slot.start_time, slot.end_time)
     );
-    return duplicate ? "This slot overlaps one already visible in this session." : "";
+    return conflictingSlot 
+      ? `This slot overlaps with existing slot ${timeLabel(conflictingSlot.start_time)}-${timeLabel(conflictingSlot.end_time)} on this date.` 
+      : "";
   }, [form, slots]);
 
   const save = async (event: FormEvent) => {
@@ -168,12 +170,30 @@ export const Dashboard = () => {
                   No slots saved for this date during this session.
                 </div>
               ) : (
-                selectedDateSlots.map((slot) => (
-                  <div key={slot.id} className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-md border border-slate-200 px-3 py-2">
-                    <span className="font-medium">{slot.date}</span>
-                    <span className="text-sm text-slate-600">{timeLabel(slot.start_time)}-{timeLabel(slot.end_time)}</span>
+                <div className="grid gap-2">
+                  <div className="hidden sm:grid grid-cols-3 gap-3 rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700">
+                    <span>Date</span>
+                    <span>Time</span>
+                    <span>Duration</span>
                   </div>
-                ))
+                  {selectedDateSlots.map((slot) => {
+                    const startHour = parseInt(slot.start_time.split(':')[0]);
+                    const startMin = parseInt(slot.start_time.split(':')[1]);
+                    const endHour = parseInt(slot.end_time.split(':')[0]);
+                    const endMin = parseInt(slot.end_time.split(':')[1]);
+                    const durationMin = (endHour * 60 + endMin) - (startHour * 60 + startMin);
+                    const durationHr = Math.floor(durationMin / 60);
+                    const durationMins = durationMin % 60;
+                    
+                    return (
+                      <div key={slot.id} className="grid sm:grid-cols-3 gap-3 rounded-md border border-moss/30 bg-moss/5 px-3 py-2 items-center">
+                        <span className="text-sm font-medium text-slate-900">{slot.date}</span>
+                        <span className="text-sm text-moss font-semibold">{timeLabel(slot.start_time)}-{timeLabel(slot.end_time)}</span>
+                        <span className="text-xs text-slate-600">{durationHr}h {durationMins}m</span>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
